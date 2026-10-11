@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sub4Unlock • Unlock Link</title>
+<style>
+  :root{
+    --bg:#0f0f11;
+    --card:rgba(28,28,30,.92);
+    --red:#e53935;
+    --blue:#1e88e5;
+    --tg:#0088cc;
+    --green:#4caf50;
+    --muted:#8b8b96;
+    --text:#ececf1;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    min-height:100vh;
+    background:radial-gradient(1200px 700px at 50% -10%, #1c0606 0%, #0a0a0c 45%, #060608 100%);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    display:flex;
+    justify-content:center;
+    padding:20px 14px;
+    position:relative;
+    overflow-x:hidden;
+  }
+
+  #particles{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+  }
+
+  .container{
+    width:100%;
+    max-width:480px;
+    position:relative;
+    z-index:1;
+  }
+
+  .card{
+    background:var(--card);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:16px;
+    padding:24px 18px;
+    box-shadow:0 10px 40px rgba(0,0,0,.6), 0 0 0 1px rgba(255,43,43,.05);
+    animation:cardIn .5s ease both;
+  }
+  @keyframes cardIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+  .header{
+    text-align:center;
+    margin-bottom:20px;
+  }
+  .header h1{
+    font-size:24px;
+    font-weight:700;
+    color:#fff;
+    margin-bottom:6px;
+  }
+  .header p{
+    font-size:13px;
+    color:var(--muted);
+  }
+
+  .task-btn{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:100%;
+    padding:14px 16px;
+    margin-bottom:10px;
+    border:none;
+    border-radius:10px;
+    font-size:14.5px;
+    font-weight:600;
+    color:#fff;
+    cursor:pointer;
+    transition:background .3s ease, transform .2s ease;
+    position:relative;
+    overflow:hidden;
+    font-family:inherit;
+  }
+  .task-btn::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(120deg, transparent 30%, rgba(255,255,255,.15) 50%, transparent 70%);
+    transform:translateX(-100%);
+    transition:transform .6s;
+  }
+  .task-btn:hover::after{ transform:translateX(100%); }
+  .task-btn:active{ transform:scale(.98); }
+
+  .task-btn.yt{ background:linear-gradient(135deg,#e53935,#b71c1c); }
+  .task-btn.like{ background:linear-gradient(135deg,#1e88e5,#0d47a1); }
+  .task-btn.tg{ background:linear-gradient(135deg,#0088cc,#005f8f); }
+
+  .task-btn.completed{
+    background:linear-gradient(135deg,#4caf50,#2e7d32) !important;
+    cursor:default;
+  }
+  .task-btn.completed::after{ display:none; }
+  .task-btn.locked{
+    background:#2c2c2e !important;
+    color:#6e6e7a;
+    cursor:not-allowed;
+  }
+  .task-btn.locked::after{ display:none; }
+  .task-btn.locked .icon-left svg{ opacity:.5; }
+
+  .task-btn .left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .task-btn .icon-left{
+    width:30px;
+    height:30px;
+    background:rgba(0,0,0,.22);
+    border-radius:7px;
+    display:grid;
+    place-items:center;
+    flex-shrink:0;
+  }
+  .task-btn .icon-left svg{
+    width:18px;
+    height:18px;
+    fill:#fff;
+  }
+  .task-btn .icon-right{
+    font-size:20px;
+    opacity:0.8;
+    font-weight:700;
+    min-width:60px;
+    text-align:right;
+    transition:color .2s;
+  }
+  .task-btn.completed .icon-right{
+    opacity:1;
+    font-size:16px;
+  }
+
+  .progress-section{
+    margin-top:18px;
+    margin-bottom:16px;
+    text-align:center;
+  }
+  .progress-text{
+    font-size:12.5px;
+    color:var(--muted);
+    margin-bottom:8px;
+    transition:color .3s;
+  }
+  .progress-bar{
+    width:100%;
+    height:6px;
+    background:#2c2c2e;
+    border-radius:99px;
+    overflow:hidden;
+  }
+  .progress-bar .fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#4caf50,#66bb6a);
+    border-radius:99px;
+    transition:width .4s ease;
+    box-shadow:0 0 12px rgba(76,175,80,.6);
+  }
+
+  .unlock-btn{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:10px;
+    font-size:14.5px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    cursor:not-allowed;
+    background:#2c2c2e;
+    color:#6e6e7a;
+    transition:all .3s ease;
+    font-family:inherit;
+  }
+  .unlock-btn .u-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .unlock-btn .u-right{
+    font-size:18px;
+    opacity:0.6;
+  }
+
+  .unlock-btn.active{
+    background:linear-gradient(135deg,#4caf50,#2e7d32);
+    color:#fff;
+    cursor:pointer;
+    box-shadow:0 8px 26px rgba(76,175,80,.5);
+    animation:pulse 1.5s infinite;
+  }
+  .unlock-btn.active .u-right{ opacity:1; }
+  @keyframes pulse{
+    0%{transform:scale(1)}
+    50%{transform:scale(1.02)}
+    100%{transform:scale(1)}
+  }
+
+  .faq{ margin-top:30px; }
+  .faq h3{
+    text-align:center;
+    font-size:14px;
+    color:#ff6b6b;
+    font-weight:700;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    margin-bottom:16px;
+    text-shadow:0 0 16px rgba(255,43,43,.5);
+  }
+  .faq-item{
+    background:var(--card);
+    backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:10px;
+  }
+  .faq-item h4{
+    font-size:13.5px;
+    font-weight:600;
+    color:#dcdce4;
+    margin-bottom:6px;
+  }
+  .faq-item p{
+    font-size:12.5px;
+    color:var(--muted);
+    line-height:1.5;
+  }
+
+  .center{
+    text-align:center;
+    padding:40px 16px;
+    color:var(--muted);
+    font-size:13.5px;
+  }
+  .spin{
+    width:36px;
+    height:36px;
+    margin:0 auto 16px;
+    border-radius:50%;
+    border:3px solid rgba(229,57,53,.2);
+    border-top-color:var(--red);
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  #toast{
+    position:fixed;
+    left:50%;
+    bottom:24px;
+    transform:translate(-50%,140%);
+    background:rgba(44,44,46,.96);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,43,43,.4);
+    color:#fff;
+    padding:12px 20px;
+    border-radius:10px;
+    font-size:13px;
+    z-index:99;
+    transition:transform .35s cubic-bezier(.2,.9,.3,1.4);
+    box-shadow:0 12px 34px rgba(0,0,0,.6);
+    max-width:90vw;
+    text-align:center;
+  }
+  #toast.show{ transform:translate(-50%,0); }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<div class="container">
+  <div id="app">
+    <div class="card">
+      <div class="center">
+        <div class="spin"></div>
+        Memuat data…
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+/* ================= FIREBASE ================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyADnkuT0a1bQ2jThXgjHxcD2P6unaTTTwo",
+  authDomain: "sub4unlock-a5ea1.firebaseapp.com",
+  databaseURL: "https://sub4unlock-a5ea1-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "sub4unlock-a5ea1",
+  storageBucket: "sub4unlock-a5ea1.firebasestorage.app",
+  messagingSenderId: "822076326275",
+  appId: "1:822076326275:web:db9cff5322e7d9de45b6b6",
+  measurementId: "G-X3W56VK5T9"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* ================= PARTICLE BACKGROUND ================= */
+(function(){
+  const c = document.getElementById('particles');
+  const ctx = c.getContext('2d');
+  let W, H, P = [], mouse = { x: -9999, y: -9999 };
+
+  function resize(){
+    W = c.width = innerWidth;
+    H = c.height = innerHeight;
+  }
+  resize();
+  addEventListener('resize', resize);
+  addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+
+  const COUNT = Math.min(90, Math.max(35, Math.floor(innerWidth / 18)));
+  for (let i = 0; i < COUNT; i++){
+    P.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - .5) * .5,
+      vy: (Math.random() - .5) * .5,
+      r: Math.random() * 1.8 + .6,
+      glow: Math.random() * .5 + .5
+    });
+  }
+
+  function loop(){
+    ctx.clearRect(0, 0, W, H);
+
+    for (const p of P){
+      p.x += p.vx;
+      p.y += p.vy;
+
+      if (p.x < 0 || p.x > W) p.vx *= -1;
+      if (p.y < 0 || p.y > H) p.vy *= -1;
+
+      const dx = mouse.x - p.x, dy = mouse.y - p.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 160 && dist > 0){
+        p.x += (dx / dist) * .35;
+        p.y += (dy / dist) * .35;
+      }
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,43,43,${0.06 * p.glow})`;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,80,80,${0.85 * p.glow})`;
+      ctx.fill();
+    }
+
+    for (let i = 0; i < P.length; i++){
+      for (let j = i + 1; j < P.length; j++){
+        const a = P[i], b = P[j];
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (d < 120){
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = `rgba(255,45,45,${0.18 * (1 - d / 120)})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* ================= HELPERS ================= */
+const $ = id => document.getElementById(id);
+let toastTimer;
+function toast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+function esc(s){
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+const app = $('app');
+
+/* ================= SVG ICONS ================= */
+const SVG_YT = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>`;
+
+const SVG_TG = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>`;
+
+/* ================= STATE ================= */
+let linkId = null;
+let tasks = [];
+let completed = [];
+let downloadUrl = '#';
+let cooldown = {};
+
+/* ================= LOAD LINK ================= */
+function getParam(name){ return new URLSearchParams(location.search).get(name); }
+linkId = getParam('id');
+
+if (!linkId){
+  app.innerHTML = `
+    <div class="card"><div class="center">
+      <div style="font-size:40px;margin-bottom:10px;">🔗</div>
+      <b style="color:#ff6b6b">Link tidak valid</b>
+      <p style="margin-top:8px">Parameter <code>?id=</code> tidak ditemukan.</p>
+    </div></div>`;
+} else {
+  // HAPUS progress lama setiap kali halaman dibuka/di-refresh
+  // → User wajib subscribe ulang dari 0
+  try { localStorage.removeItem('s4u_' + linkId); } catch (e){}
+
+  db.ref('links/' + linkId).once('value')
+    .then(snap => {
+      const data = snap.val();
+      if (!data){
+        app.innerHTML = `
+          <div class="card"><div class="center">
+            <div style="font-size:40px;margin-bottom:10px;">🚫</div>
+            <b style="color:#ff6b6b">Link tidak ditemukan</b>
+            <p style="margin-top:8px">Link mungkin sudah dihapus.</p>
+          </div></div>`;
+        return;
+      }
+      tasks = Array.isArray(data.tasks) ? data.tasks : [];
+      downloadUrl = data.downloadUrl || '';
+
+      if (!tasks.length){
+        app.innerHTML = `
+          <div class="card"><div class="center">
+            <div style="font-size:40px;margin-bottom:10px;">📭</div>
+            <b style="color:#ff6b6b">Belum ada task</b>
+            <p style="margin-top:8px">Admin belum menambahkan task.</p>
+          </div></div>`;
+        return;
+      }
+
+      // ✅ SELALU mulai dari 0 — tidak ada penyimpanan progress
+      completed = tasks.map(() => false);
+
+      render();
+    })
+    .catch(err => {
+      app.innerHTML = `
+        <div class="card"><div class="center">
+          <div style="font-size:40px;margin-bottom:10px;">⚠️</div>
+          <b style="color:#ff6b6b">Gagal memuat</b>
+          <p style="margin-top:8px">${esc(err.message)}</p>
+        </div></div>`;
+    });
+}
+
+/* ================= RENDER ================= */
+function render(){
+  const total = tasks.length;
+  const selesai = completed.filter(Boolean).length;
+  const percent = Math.round((selesai / total) * 100);
+  const allDone = selesai === total;
+  const nextIdx = completed.findIndex(v => !v);
+
+  let html = `
+    <div class="card">
+      <div class="header">
+        <h1>Unlock Link</h1>
+        <p>Complete the actions and unlock the link</p>
+      </div>
+  `;
+
+  tasks.forEach((t, i) => {
+    const isDone = completed[i];
+    const isLocked = i > nextIdx && !isDone;
+
+    let btnClass = 'task-btn';
+    let label = '';
+    let iconSvg = SVG_YT;
+
+    if (t.type === 'subscribe'){
+      btnClass += ' yt';
+      label = 'Subscribe On Youtube';
+      iconSvg = SVG_YT;
+    } else if (t.type === 'subscribe_bell'){
+      btnClass += ' yt';
+      label = 'Subscribe & hit bell icon';
+      iconSvg = SVG_YT;
+    } else if (t.type === 'like'){
+      btnClass += ' like';
+      label = 'Like On Video';
+      iconSvg = SVG_YT;
+    } else if (t.type === 'telegram'){
+      btnClass += ' tg';
+      label = 'Join Telegram';
+      iconSvg = SVG_TG;
+    }
+
+    let rightIcon = '›';
+    if (isDone){
+      btnClass += ' completed';
+      rightIcon = '✓';
+    } else if (isLocked){
+      btnClass += ' locked';
+      rightIcon = '🔒';
+    } else if (cooldown[i] !== undefined){
+      rightIcon = `⏳ ${cooldown[i]}s`;
+    }
+
+    html += `
+      <button class="${btnClass}" data-index="${i}" ${isLocked ? 'disabled' : ''}>
+        <div class="left">
+          <span class="icon-left">${iconSvg}</span>
+          <span>${label}</span>
+        </div>
+        <span class="icon-right" data-icon-for="${i}">${rightIcon}</span>
+      </button>
+    `;
+  });
+
+  html += `
+      <div class="progress-section">
+        <div class="progress-text" id="progressText">unlock progress ${selesai}/${total}</div>
+        <div class="progress-bar">
+          <div class="fill" id="progressFill" style="width:${percent}%"></div>
+        </div>
+      </div>
+  `;
+
+  if (allDone){
+    html += `
+      <button class="unlock-btn active" id="finalUnlockBtn">
+        <div class="u-left">
+          <span style="font-size:18px;">🔓</span>
+          <span>Buka Link Download</span>
+        </div>
+        <span class="u-right">🔗</span>
+      </button>
+    `;
+  } else {
+    html += `
+      <button class="unlock-btn" disabled>
+        <div class="u-left">
+          <span style="font-size:18px;">🔒</span>
+          <span>Unlock Link</span>
+        </div>
+        <span class="u-right">🔗</span>
+      </button>
+    `;
+  }
+
+  html += `</div>`;
+
+  html += `
+    <div class="faq">
+      <h3>- FAQ -</h3>
+      <div class="faq-item">
+        <h4>How to Unlock link ?</h4>
+        <p>Klik tombol task secara berurutan. Setelah Anda menyelesaikan satu task, tombol berikutnya akan terbuka. Jika semua task sudah selesai, tombol <b>Buka Link Download</b> akan muncul.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Apakah harus subscribe?</h4>
+        <p>Ya, Anda wajib subscribe YouTube terlebih dahulu sesuai instruksi sebelum bisa lanjut ke task berikutnya.</p>
+      </div>
+    </div>
+  `;
+
+  app.innerHTML = html;
+
+  document.querySelectorAll('.task-btn').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.dataset.index);
+      if (completed[idx]) return;
+      if (cooldown[idx] !== undefined) return toast('Tunggu timer selesai...');
+      if (idx > nextIdx) return toast('Selesaikan task sebelumnya dulu!');
+
+      window.open(normalizeUrl(tasks[idx].url), '_blank', 'noopener');
+      startCooldown(idx);
+    };
+  });
+
+  const finalBtn = $('finalUnlockBtn');
+  if (finalBtn){
+    finalBtn.onclick = () => {
+      if (downloadUrl && downloadUrl.trim()){
+        window.open(normalizeUrl(downloadUrl), '_blank', 'noopener');
+        toast('Link download terbuka!');
+      } else {
+        toast('Admin belum mengatur link download.');
+      }
+    };
+  }
+}
+
+/* ---------- TIMER 5 DETIK (TANPA KEDIP) ---------- */
+function startCooldown(idx){
+  let sisa = 5;
+  cooldown[idx] = sisa;
+
+  // Update HANYA teks timer di tombol, bukan seluruh halaman
+  const iconEl = document.querySelector(`[data-icon-for="${idx}"]`);
+  if (iconEl) iconEl.textContent = `⏳ ${sisa}s`;
+
+  const interval = setInterval(() => {
+    sisa--;
+    if (sisa <= 0){
+      clearInterval(interval);
+      delete cooldown[idx];
+
+      // Task selesai → tandai & render ulang sekali
+      completed[idx] = true;
+      toast('Task selesai ✓');
+      render();
+    } else {
+      cooldown[idx] = sisa;
+
+      // Update langsung teks timer tanpa render ulang seluruh halaman
+      const iconEl2 = document.querySelector(`[data-icon-for="${idx}"]`);
+      if (iconEl2) iconEl2.textContent = `⏳ ${sisa}s`;
+    }
+  }, 1000);
+}
+
+function normalizeUrl(u){
+  if (/^https?:\/\//i.test(u)) return u;
+  return 'https://' + u;
+}
+</script>
+</body>
+</html>
